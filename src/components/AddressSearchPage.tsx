@@ -2,35 +2,26 @@ import React, { useState, FormEvent, ChangeEvent } from "react";
 import { Search } from "lucide-react";
 import { useGetKakaoSearchKeywordQuery } from "../api/kakao/KakaoApi.query";
 
-interface AddressResult {
-  roadAddress: string;
-  jibunAddress: string;
-  postalCode: string;
-  buildingName?: string;
-}
 const AddressSearchPage = () => {
-  const [searchResult, setSearchResult] = useState<AddressResult | null>(null);
   const [address, setAddress] = useState<string>("");
 
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const { data: kakaoSearchKeywordList, isFetching } =
-    useGetKakaoSearchKeywordQuery({
-      variables: { query: searchQuery },
-      options: {
-        enabled: !!searchQuery,
-      },
-    });
+  const { data: kakaoSearchKeywordList } = useGetKakaoSearchKeywordQuery({
+    variables: { query: searchQuery },
+    options: {
+      enabled: !!searchQuery,
+    },
+  });
 
   const handleSearch = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     try {
-      const tempData: AddressResult = {
-        roadAddress: "서울특별시 강남구 테헤란로 152",
-        jibunAddress: "서울특별시 강남구 역삼동 737",
-        postalCode: "06236",
-        buildingName: "강남파이낸스센터",
-      };
-      setSearchResult(tempData);
+      //   const tempData: AddressResult = {
+      //     roadAddress: "서울특별시 강남구 테헤란로 152",
+      //     jibunAddress: "서울특별시 강남구 역삼동 737",
+      //     postalCode: "06236",
+      //     buildingName: "강남파이낸스센터",
+      //   };
     } catch (error) {
       console.error("검색 중 오류 발생:", error);
     }

@@ -1,8 +1,8 @@
-import { MutationHookParams } from '@apis/type';
+// import { MutationHookParams } from '@apis/type';
 
-import { useMutation } from '@tanstack/react-query';
+// import { useMutation } from '@tanstack/react-query';
 
-import kakaoApi from './KakaoApi';
+// import kakaoApi from './KakaoApi';
 
 // import {
 //   ExampleDTOType,
