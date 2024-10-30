@@ -1,11 +1,11 @@
-// vercel.json
 {
     "builds": [
       {
         "src": "vite.config.ts",
         "use": "@vercel/static-build",
         "config": {
-          "distDir": "build" // 출력 디렉토리를 'build'로 설정
+
+            "distDir": "build"
         }
       }
     ]
