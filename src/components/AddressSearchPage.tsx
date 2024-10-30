@@ -2,14 +2,28 @@ import React, { useState, FormEvent, ChangeEvent } from "react";
 import { Search } from "lucide-react";
 import { useGetKakaoSearchKeywordQuery } from "../api/kakao/KakaoApi.query";
 
+type SearchModeType = "keyword" | "address";
+
+const MODE_EXPLAIN = {
+  keyword: "키워드 검색",
+  address: "주소 검색",
+};
+
 const AddressSearchPage = () => {
   const [address, setAddress] = useState<string>("");
-
+  const [searchMode, setSearchMode] = useState<SearchModeType>("keyword");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { data: kakaoSearchKeywordList } = useGetKakaoSearchKeywordQuery({
     variables: { query: searchQuery },
     options: {
-      enabled: !!searchQuery,
+      enabled: !!searchQuery && searchMode === "keyword",
+    },
+  });
+
+  const { data: kakaoSearchAddressList } = useGetKakaoSearchKeywordQuery({
+    variables: { query: searchQuery },
+    options: {
+      enabled: !!searchQuery && searchMode === "address",
     },
   });
 
@@ -39,6 +53,25 @@ const AddressSearchPage = () => {
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">주소 검색</h1>
           <p className="text-gray-600">찾으시는 주소를 입력해주세요</p>
+          <p className="text-black my-4">
+            현재 검색 모드 : {MODE_EXPLAIN[searchMode]}
+          </p>
+        </div>
+        <div className="mb-8 text-center">
+          <input
+            type="button"
+            className="mx-2 cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-lg px-4 py-2 hover:bg-gray-300"
+            aria-label="키워드 검색"
+            onClick={() => setSearchMode("keyword")}
+            value={"키워드"}
+          />
+          <input
+            type="button"
+            className="cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-lg px-4 py-2 hover:bg-gray-300"
+            aria-label="주소 검색"
+            onClick={() => setSearchMode("address")}
+            value={"주소 검색"}
+          />
         </div>
         <form onSubmit={handleSearch} className="mb-6">
           <div className="relative">
@@ -58,25 +91,47 @@ const AddressSearchPage = () => {
             </button>
           </div>
         </form>
-        <React.Suspense fallback={<div>로딩중...</div>}>
-          {kakaoSearchKeywordList &&
-            kakaoSearchKeywordList?.documents.length > 0 && (
-              <div className="bg-white rounded-lg border border-gray-200 shadow-lg">
-                <div className="p-6">
-                  <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-                    <code className="text-sm text-black">
-                      {JSON.stringify(
-                        kakaoSearchKeywordList.documents,
-                        null,
-                        2
-                      )}
-                    </code>
-                  </pre>
+        {searchMode === "keyword" && (
+          <React.Suspense fallback={<div>로딩중...</div>}>
+            {kakaoSearchKeywordList &&
+              kakaoSearchKeywordList?.documents.length > 0 && (
+                <div className="bg-white rounded-lg border border-gray-200 shadow-lg">
+                  <div className="p-6">
+                    <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                      <code className="text-sm text-black">
+                        {JSON.stringify(
+                          kakaoSearchKeywordList.documents,
+                          null,
+                          2
+                        )}
+                      </code>
+                    </pre>
+                  </div>
                 </div>
-              </div>
-            )}
-        </React.Suspense>
-        .
+              )}
+          </React.Suspense>
+        )}
+
+        {searchMode === "address" && (
+          <React.Suspense fallback={<div>로딩중...</div>}>
+            {kakaoSearchAddressList &&
+              kakaoSearchAddressList?.documents.length > 0 && (
+                <div className="bg-white rounded-lg border border-gray-200 shadow-lg">
+                  <div className="p-6">
+                    <pre className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
+                      <code className="text-sm text-black">
+                        {JSON.stringify(
+                          kakaoSearchAddressList.documents,
+                          null,
+                          2
+                        )}
+                      </code>
+                    </pre>
+                  </div>
+                </div>
+              )}
+          </React.Suspense>
+        )}
       </div>
     </div>
   );
