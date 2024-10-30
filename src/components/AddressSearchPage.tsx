@@ -49,8 +49,8 @@ const AddressSearchPage = () => {
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex">
-      <div className="mx-auto w-[780px] p-4">
-        <div className="mb-8 text-center">
+      <div className="mx-auto w-full max-w-[780px] p-4 justify-center item-center">
+        <div className="mb-8 text-center justify-center item-center ">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">주소 검색</h1>
           <p className="text-gray-600">찾으시는 주소를 입력해주세요</p>
           <p className="text-black my-4">
@@ -60,7 +60,7 @@ const AddressSearchPage = () => {
         <div className="mb-8 text-center">
           <input
             type="button"
-            className="mx-2 cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-lg px-4 py-2 hover:bg-gray-300"
+            className="mx-2 mb-2 md:mb-0 cursor-pointer right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 bg-gray-100 rounded-lg px-4 py-2 hover:bg-gray-300"
             aria-label="키워드 검색"
             onClick={() => setSearchMode("keyword")}
             value={"키워드"}
