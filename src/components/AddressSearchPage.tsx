@@ -2,7 +2,7 @@ import React, { useState, FormEvent, ChangeEvent } from "react";
 import { Search } from "lucide-react";
 import { useGetKakaoSearchAddressQuery, useGetKakaoSearchKeywordQuery } from "../api/kakao/KakaoApi.query";
 import DaumPostcodeEmbed from 'react-daum-postcode';
-import { Address, PostcodeOptions } from "react-daum-postcode/lib/loadPostcode";
+import { Address } from "react-daum-postcode/lib/loadPostcode";
 import SearchResultBlock from "./SearchResultBlock";
 import { SearchAddressDocumentType, SearchKeywordDocumentsType } from "../api/kakao/KakaoApi.type";
 
@@ -61,7 +61,7 @@ const AddressSearchPage = () => {
     setSearchQuery(value);
   };
 
-  console.log('[selectedPostCodeAddress] : ', selectedPostCodeAddress);
+  // console.log('[selectedPostCodeAddress] : ', selectedPostCodeAddress);
 
 
   const handleComplete = (data: Address) => {
@@ -174,10 +174,12 @@ const AddressSearchPage = () => {
               <DaumPostcodeEmbed autoClose={false} onComplete={handleComplete} />
 
               {postCodeSearchAddress && postCodeSearchAddress.documents.map((item, index) => {
-                return <div key={index}>
-                  <div>이름 : {item.address_name}</div>
-                  <div>{`위도(y) : ${item.y}`}</div>
-                  <div>{`경도(x) : ${item.x}`}</div>
+                return <div key={index} className="mt-3 flex ">
+                  <code>
+                    <div>이름 : {item.address_name}</div>
+                    <div>{`위도(y) : ${item.y}`}</div>
+                    <div>{`경도(x) : ${item.x}`}</div>
+                  </code>
                 </div>
               })}
             </React.Suspense>
