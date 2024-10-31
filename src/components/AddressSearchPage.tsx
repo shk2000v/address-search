@@ -19,17 +19,25 @@ const AddressSearchPage = () => {
   const [address, setAddress] = useState<string>("");
   const [searchMode, setSearchMode] = useState<SearchModeType>("keyword");
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedPostCodeAddress, setSelectedPostCodeAddress] = useState('');
   const { data: kakaoSearchKeywordList } = useGetKakaoSearchKeywordQuery({
     variables: { query: searchQuery },
     options: {
-      enabled: !!searchQuery && searchMode === "both" || searchMode === "keyword",
+      enabled: searchQuery.length > 0 && searchMode === "both" || searchMode === "keyword",
     },
   });
 
   const { data: kakaoSearchAddressList } = useGetKakaoSearchAddressQuery({
     variables: { query: searchQuery },
     options: {
-      enabled: !!searchQuery && searchMode === "both" || searchMode === "address",
+      enabled: searchQuery.length > 0 && searchMode === "both" || searchMode === "address",
+    },
+  });
+
+  const { data: postCodeSearchAddress } = useGetKakaoSearchAddressQuery({
+    variables: { query: selectedPostCodeAddress },
+    options: {
+      enabled: selectedPostCodeAddress.length > 0 && searchMode === "postcode",
     },
   });
 
@@ -53,8 +61,11 @@ const AddressSearchPage = () => {
     setSearchQuery(value);
   };
 
+  console.log('[selectedPostCodeAddress] : ', selectedPostCodeAddress);
+
 
   const handleComplete = (data: Address) => {
+    setSelectedPostCodeAddress(data.address)
     let fullAddress = data.address;
     let extraAddress = '';
 
@@ -161,6 +172,14 @@ const AddressSearchPage = () => {
           {searchMode === "postcode" &&
             <React.Suspense fallback={<div>로딩중...</div>}>
               <DaumPostcodeEmbed autoClose={false} onComplete={handleComplete} />
+
+              {postCodeSearchAddress && postCodeSearchAddress.documents.map((item, index) => {
+                return <div key={index}>
+                  <div>이름 : {item.address_name}</div>
+                  <div>{`위도(y) : ${item.y}`}</div>
+                  <div>{`경도(x) : ${item.x}`}</div>
+                </div>
+              })}
             </React.Suspense>
           }
         </div>
