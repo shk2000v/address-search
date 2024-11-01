@@ -1,10 +1,16 @@
 import React, { useState, FormEvent, ChangeEvent } from "react";
 import { Search } from "lucide-react";
-import { useGetKakaoSearchAddressQuery, useGetKakaoSearchKeywordQuery } from "../api/kakao/KakaoApi.query";
-import DaumPostcodeEmbed from 'react-daum-postcode';
+import {
+  useGetKakaoSearchAddressQuery,
+  useGetKakaoSearchKeywordQuery,
+} from "../api/kakao/KakaoApi.query";
+import DaumPostcodeEmbed from "react-daum-postcode";
 import { Address } from "react-daum-postcode/lib/loadPostcode";
 import SearchResultBlock from "./SearchResultBlock";
-import { SearchAddressDocumentType, SearchKeywordDocumentsType } from "../api/kakao/KakaoApi.type";
+import {
+  SearchAddressDocumentType,
+  SearchKeywordDocumentsType,
+} from "../api/kakao/KakaoApi.type";
 
 type SearchModeType = "keyword" | "address" | "both" | "postcode";
 
@@ -12,25 +18,29 @@ const MODE_EXPLAIN: Record<SearchModeType, string> = {
   keyword: "키워드 검색",
   address: "주소 검색",
   both: "키워드 + 주소 검색",
-  postcode: "우편번호 검색"
+  postcode: "우편번호 검색",
 };
 
 const AddressSearchPage = () => {
   const [address, setAddress] = useState<string>("");
   const [searchMode, setSearchMode] = useState<SearchModeType>("keyword");
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedPostCodeAddress, setSelectedPostCodeAddress] = useState('');
+  const [selectedPostCodeAddress, setSelectedPostCodeAddress] = useState("");
   const { data: kakaoSearchKeywordList } = useGetKakaoSearchKeywordQuery({
     variables: { query: searchQuery },
     options: {
-      enabled: searchQuery.length > 0 && searchMode === "both" || searchMode === "keyword",
+      enabled:
+        (searchQuery.length > 0 && searchMode === "both") ||
+        searchMode === "keyword",
     },
   });
 
   const { data: kakaoSearchAddressList } = useGetKakaoSearchAddressQuery({
     variables: { query: searchQuery },
     options: {
-      enabled: searchQuery.length > 0 && searchMode === "both" || searchMode === "address",
+      enabled:
+        (searchQuery.length > 0 && searchMode === "both") ||
+        searchMode === "address",
     },
   });
 
@@ -63,24 +73,26 @@ const AddressSearchPage = () => {
 
   // console.log('[selectedPostCodeAddress] : ', selectedPostCodeAddress);
 
-
   const handleComplete = (data: Address) => {
-    setSelectedPostCodeAddress(data.address)
+    setSelectedPostCodeAddress(data.address);
     let fullAddress = data.address;
-    let extraAddress = '';
+    let extraAddress = "";
 
-    if (data.addressType === 'R') {
-      if (data.bname !== '') {
+    if (data.addressType === "R") {
+      if (data.bname !== "") {
         extraAddress += data.bname;
       }
-      if (data.buildingName !== '') {
-        extraAddress += extraAddress !== '' ? `, ${data.buildingName}` : data.buildingName;
+      if (data.buildingName !== "") {
+        extraAddress +=
+          extraAddress !== "" ? `, ${data.buildingName}` : data.buildingName;
       }
-      fullAddress += extraAddress !== '' ? ` (${extraAddress})` : '';
+      fullAddress += extraAddress !== "" ? ` (${extraAddress})` : "";
     }
 
     console.log(fullAddress); // e.g. '서울 성동구 왕십리로2길 20 (성수동1가)'
   };
+
+  console.log("[postCodeSearchAddress] : ", postCodeSearchAddress);
 
   return (
     <div className="min-h-screen w-full bg-gray-50 flex">
@@ -105,9 +117,8 @@ const AddressSearchPage = () => {
               />
             );
           })}
-
         </div>
-        {searchMode !== "postcode" &&
+        {searchMode !== "postcode" && (
           <form onSubmit={handleSearch} className="mb-6">
             <div className="relative">
               <input
@@ -126,14 +137,17 @@ const AddressSearchPage = () => {
               </button>
             </div>
           </form>
-        }
+        )}
         <div>
           {searchMode === "keyword" && (
             <React.Suspense fallback={<div>로딩중...</div>}>
               {kakaoSearchKeywordList &&
                 kakaoSearchKeywordList?.documents.length > 0 && (
                   <SearchResultBlock>
-                    <KeywordSearchResult keywords={kakaoSearchKeywordList.documents} />
+                    <KeywordSearchResult
+                      keywords={kakaoSearchKeywordList.documents}
+                    />
+                    {/* {JSON.stringify(kakaoSearchKeywordList.documents, null, 2)} */}
                   </SearchResultBlock>
                 )}
             </React.Suspense>
@@ -144,7 +158,9 @@ const AddressSearchPage = () => {
               {kakaoSearchAddressList &&
                 kakaoSearchAddressList?.documents.length > 0 && (
                   <SearchResultBlock>
-                    <AddressSearchResult address={kakaoSearchAddressList.documents} />
+                    <AddressSearchResult
+                      address={kakaoSearchAddressList.documents}
+                    />
                   </SearchResultBlock>
                 )}
             </React.Suspense>
@@ -156,34 +172,43 @@ const AddressSearchPage = () => {
                   kakaoSearchKeywordList?.documents.length > 0 && (
                     <SearchResultBlock>
                       <h3 className="">키워드 검색 결과</h3>
-                      <KeywordSearchResult keywords={kakaoSearchKeywordList.documents} />
+                      <KeywordSearchResult
+                        keywords={kakaoSearchKeywordList.documents}
+                      />
                     </SearchResultBlock>
                   )}
                 {kakaoSearchAddressList &&
                   kakaoSearchAddressList?.documents.length > 0 && (
                     <SearchResultBlock>
                       <h2>주소 검색 결과</h2>
-                      <AddressSearchResult address={kakaoSearchAddressList.documents} />
+                      <AddressSearchResult
+                        address={kakaoSearchAddressList.documents}
+                      />
                     </SearchResultBlock>
                   )}
               </div>
             </React.Suspense>
           )}
-          {searchMode === "postcode" &&
+          {searchMode === "postcode" && (
             <React.Suspense fallback={<div>로딩중...</div>}>
-              <DaumPostcodeEmbed autoClose={false} onComplete={handleComplete} />
-
-              {postCodeSearchAddress && postCodeSearchAddress.documents.map((item, index) => {
-                return <div key={index} className="mt-3 flex ">
-                  <code>
-                    <div>이름 : {item.address_name}</div>
-                    <div>{`위도(y) : ${item.y}`}</div>
-                    <div>{`경도(x) : ${item.x}`}</div>
-                  </code>
-                </div>
-              })}
+              <DaumPostcodeEmbed
+                autoClose={false}
+                onComplete={handleComplete}
+              />
+              {postCodeSearchAddress &&
+                postCodeSearchAddress.documents.map((item, index) => {
+                  return (
+                    <div key={index} className="mt-3 flex text-black">
+                      <code>
+                        <div>이름 : {item.address_name}</div>
+                        <div>{`위도(y) : ${item.y}`}</div>
+                        <div>{`경도(x) : ${item.x}`}</div>
+                      </code>
+                    </div>
+                  );
+                })}
             </React.Suspense>
-          }
+          )}
         </div>
       </div>
     </div>
@@ -192,28 +217,34 @@ const AddressSearchPage = () => {
 
 export default AddressSearchPage;
 
-
 type SearchResultType = {
   keywords: Array<SearchKeywordDocumentsType>;
   address: Array<SearchAddressDocumentType>;
-}
-const KeywordSearchResult = ({ keywords }: Pick<SearchResultType, 'keywords'>) => (
+};
+const KeywordSearchResult = ({
+  keywords,
+}: Pick<SearchResultType, "keywords">) =>
   keywords.map((item, index) => {
-    return <div key={`${index}`} className="mb-4">
-      <div>{index + 1}.</div>
-      <div>주소 이름 : {item.address_name}</div>
-      <div>도로명 이름 : {item.road_address_name}</div>
-      <div>{`위도(y) : ${item.y}`}</div>
-      <div>{`경도(x) : ${item.x}`}</div>
-    </div>
-  }));
+    return (
+      <div key={`${index}`} className="mb-4">
+        <div>{index + 1}.</div>
+        <div>장소 이름 : {item.place_name}</div>
+        <div>주소 이름 : {item.address_name}</div>
+        <div>도로명 이름 : {item.road_address_name}</div>
+        <div>{`위도(y) : ${item.y}`}</div>
+        <div>{`경도(x) : ${item.x}`}</div>
+      </div>
+    );
+  });
 
-const AddressSearchResult = ({ address }: Pick<SearchResultType, 'address'>) => (
+const AddressSearchResult = ({ address }: Pick<SearchResultType, "address">) =>
   address.map((item, index) => {
-    return <div key={`${index}`} className="mb-4">
-      <div>{index + 1}.</div>
-      <div>주소 이름 : {item.address_name}</div>
-      <div>{`위도(y) : ${item.y}`}</div>
-      <div>{`경도(x) : ${item.x}`}</div>
-    </div>
-  }));
+    return (
+      <div key={`${index}`} className="mb-4">
+        <div>{index + 1}.</div>
+        <div>주소 이름 : {item.address_name}</div>
+        <div>{`위도(y) : ${item.y}`}</div>
+        <div>{`경도(x) : ${item.x}`}</div>
+      </div>
+    );
+  });
